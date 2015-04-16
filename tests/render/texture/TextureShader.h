@@ -17,8 +17,7 @@
 
 #pragma once
 
-#include <VertexShader.h>
-#include <PixelShader.h>
+#include <Shader.h>
 
 using namespace librender;
 
@@ -27,15 +26,15 @@ struct TextureUniforms
 	Matrix fMVPMatrix;
 };
 
-class TextureVertexShader : public VertexShader
+class TextureShader : public Shader
 {
 public:
-	TextureVertexShader()
-		:	VertexShader(5, 6)
+	TextureShader()
+		:	Shader(5, 6)
 	{
 	}
 
-	void shadeVertices(vecf16_t *outParams, const vecf16_t *inAttribs, const void *_uniforms,
+	void shadeVertices(vecf16_t outParams[], const vecf16_t inAttribs[], const void *_uniforms,
         int ) const override
 	{
         const TextureUniforms *uniforms = static_cast<const TextureUniforms*>(_uniforms);
@@ -52,12 +51,8 @@ public:
 		outParams[4] = inAttribs[3];
 		outParams[5] = inAttribs[4];
 	}
-};
 
-class TexturePixelShader : public librender::PixelShader
-{
-public:
-	void shadePixels(const vecf16_t inParams[16], vecf16_t outColor[4],
+	void shadePixels(vecf16_t outColor[4], const vecf16_t inParams[16], 
 		const void *, const Texture * const sampler[kMaxTextures],
 		unsigned short mask) const override
 	{

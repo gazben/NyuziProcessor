@@ -50,7 +50,7 @@ int main()
 	renderTarget->setDepthBuffer(depthBuffer);
 	context->bindTarget(renderTarget);
 	context->enableDepthBuffer(true);
-	context->bindShader(new PhongVertexShader(), new PhongPixelShader());
+	context->bindShader(new PhongShader());
 
 	PhongUniforms uniforms;
 	uniforms.fLightVector[0] = 0.7071067811f;
@@ -59,7 +59,9 @@ int main()
 	uniforms.fDirectional = 0.6f;		
 	uniforms.fAmbient = 0.2f;
 
-	context->bindGeometry(kTeapotVertices, kNumTeapotVertices, kTeapotIndices, kNumTeapotIndices);
+	const RenderBuffer kVertices(kTeapotVertices, kNumTeapotVertices, 6 * sizeof(float));
+	const RenderBuffer kIndices(kTeapotIndices, kNumTeapotIndices, sizeof(int));
+	context->bindGeometry(&kVertices, &kIndices);
 
 	Matrix projectionMatrix = Matrix::getProjectionMatrix(kFbWidth, kFbHeight);
 	Matrix modelViewMatrix;

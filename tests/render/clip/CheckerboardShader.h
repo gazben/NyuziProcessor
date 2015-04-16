@@ -17,8 +17,7 @@
 
 #pragma once
 
-#include <VertexShader.h>
-#include <PixelShader.h>
+#include <Shader.h>
 
 using namespace librender;
 
@@ -27,15 +26,15 @@ struct CheckerboardUniforms
 	Matrix fMVPMatrix;
 };
 
-class CheckerboardVertexShader : public VertexShader
+class CheckerboardShader : public Shader
 {
 public:
-	CheckerboardVertexShader()
-		:	VertexShader(5, 6)
+	CheckerboardShader()
+		:	Shader(5, 6)
 	{
 	}
 
-	void shadeVertices(vecf16_t *outParams, const vecf16_t *inAttribs, const void *_uniforms,
+	void shadeVertices(vecf16_t outParams[], const vecf16_t inAttribs[], const void *_uniforms,
         int ) const override
 	{
         const CheckerboardUniforms *uniforms = static_cast<const CheckerboardUniforms*>(_uniforms);
@@ -52,18 +51,13 @@ public:
 		outParams[4] = inAttribs[3];
 		outParams[5] = inAttribs[4];
 	}
-};
 
-
-class CheckerboardPixelShader : public librender::PixelShader
-{
-public:
-	void shadePixels(const vecf16_t inParams[16], vecf16_t outColor[4],
+	void shadePixels(vecf16_t outColor[4], const vecf16_t inParams[16], 
 		const void *, const Texture * const [kMaxTextures],
 		unsigned short ) const override
 	{
-		int check = __builtin_nyuzi_mask_cmpi_eq(((__builtin_nyuzi_vftoi(inParams[0] * splatf(4)) & splati(1))
-			^ (__builtin_nyuzi_vftoi(inParams[1] * splatf(4)) & splati(1))), splati(0));
+		int check = __builtin_nyuzi_mask_cmpi_eq(((__builtin_convertvector(inParams[0] * splatf(4), veci16_t) & splati(1))
+			^ (__builtin_convertvector(inParams[1] * splatf(4), veci16_t) & splati(1))), splati(0));
 		outColor[kColorR] = outColor[kColorG] = outColor[kColorB] = __builtin_nyuzi_vector_mixf(check, splatf(1.0),
 			splatf(0.0));
 		outColor[kColorA] = splatf(1.0);

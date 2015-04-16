@@ -17,20 +17,19 @@
 
 #pragma once
 
-#include <VertexShader.h>
-#include <PixelShader.h>
+#include <Shader.h>
 
 using namespace librender;
 
-class ColorVertexShader : public librender::VertexShader
+class ColorShader : public Shader
 {
 public:
-	ColorVertexShader()
-		:	VertexShader(7, 8)
+	ColorShader()
+		:	Shader(7, 8)
 	{
 	}
 
-	void shadeVertices(vecf16_t *outParams, const vecf16_t *inAttribs, const void *,
+	void shadeVertices(vecf16_t outParams[], const vecf16_t inAttribs[], const void *,
         int) const override
 	{
 		// Position
@@ -45,12 +44,8 @@ public:
 		outParams[6] = inAttribs[5];
 		outParams[7] = inAttribs[6];
 	}
-};
 
-class ColorPixelShader : public librender::PixelShader
-{
-public:
-	void shadePixels(const vecf16_t inParams[16], vecf16_t outColor[4],
+	void shadePixels(vecf16_t outColor[4], const vecf16_t inParams[16], 
 		const void *, const Texture * const [kMaxTextures],
 		unsigned short) const override
 	{

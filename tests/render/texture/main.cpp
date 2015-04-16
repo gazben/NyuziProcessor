@@ -52,8 +52,11 @@ int main()
 	renderTarget->setDepthBuffer(depthBuffer);
 	context->bindTarget(renderTarget);
 	context->enableDepthBuffer(true);
-	context->bindShader(new TextureVertexShader(), new TexturePixelShader());
-	context->bindGeometry(kCubeVertices, kNumCubeVertices, kCubeIndices, kNumCubeIndices);
+	context->bindShader(new TextureShader());
+
+	const RenderBuffer kVertices(kCubeVertices, kNumCubeVertices, 5 * sizeof(float));
+	const RenderBuffer kIndices(kCubeIndices, kNumCubeIndices, sizeof(int));
+	context->bindGeometry(&kVertices, &kIndices);
 
 	Texture *texture = new Texture();
 	texture->setMipSurface(0, new Surface(512, 512, (void*) kCrateTexture));

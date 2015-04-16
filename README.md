@@ -1,131 +1,144 @@
 # Nyuzi Processor
 
-Nyuzi is a GPGPU processor core implemented in SystemVerilog. It
-features a pipelined vector floating point unit, fine grained hardware 
-multithreading, multiprocessor support, and a coherent L1/L2 cache hierarchy. 
-It is fully synthesizable and has been validated on FPGA. This project also 
-includes a C++ toolchain based on LLVM, an emulator, software libraries, and 
-RTL verification tests. It is useful as a platform for microarchitecture 
+Nyuzi is an experimental multicore GPGPU processor implemented in 
+SystemVerilog. It supports vector floating point, fine grained hardware 
+multithreading, and a coherent L1/L2 cache hierarchy. It is fully 
+synthesizable and has been validated on FPGA. This project also includes 
+a C++ toolchain based on LLVM, an emulator, software libraries, and RTL 
+verification tests. It is useful as a platform for microarchitecture 
 experimentation, performance modeling, and parallel software development.   
 
 License: Apache 2.0    
 Documentation: https://github.com/jbush001/NyuziProcessor/wiki  
 Mailing list: https://groups.google.com/forum/#!forum/nyuzi-processor-dev  
+Blog: http://latchup.blogspot.com/
 
-# Running in Verilog Simulation
+# Getting Started
 
-This environment allows cycle-accurate simulation of the hardware without an FPGA. 
+These instructions explain how to get the design working in Verilog simulation.
+This environment allows cycle-accurate modeling of the hardware without an FPGA. 
 
-## Prerequisites
+## Required Software
 
-The following software packages are required: 
+Instructions for obtaining these packages are in the following sections.
 
 - GCC 4.8+ or Apple Clang 4.2+
 - Python 2.7
 - [Verilator 3.864+](http://www.veripool.org/projects/verilator/wiki/Installing).  
 - Perl 5.x+ (required by Verilator)
-- C/C++ cross compiler toolchain targeting this architecture. Download and 
-   build from https://github.com/jbush001/NyuziToolchain using instructions
-   in the README file in that repository.
+- Nyuzi cross compiler toolchain: https://github.com/jbush001/NyuziToolchain 
 - libsdl 2.0
 - ImageMagick
 
-Optional packages:
+## Optional Software:
 
 - Emacs v23.2+, for 
-   [AUTOWIRE/AUTOINST](http://www.veripool.org/projects/verilog-mode/wiki/Verilog-mode_veritedium). (This can be used in batch mode by typing 'make autos' in the rtl/ directory). 
+   [AUTOWIRE/AUTOINST](http://www.veripool.org/projects/verilog-mode/wiki/Verilog-mode_veritedium).
 - Java (J2SE 6+) for visualizer app 
 - [GTKWave](http://gtkwave.sourceforge.net/) for analyzing waveform files 
 
-### Linux
+## Building on Linux
 
-On Linux, these can be installed using the built-in package manager (apt-get, yum, etc). 
-Here is the command line for Ubuntu:
+First, build the Nyuzi toolchain following instructions in https://github.com/jbush001/NyuziToolchain 
+
+Next, you will need Verilator.  Many package managers have Verilator, but it 
+may be out of date. It can be installed as follows (assuming Ubuntu):
+
+    sudo apt-get install verilator
+    verilator --version.
+
+Bug fixes in at least version 3.864 are necessary for it to run properly 
+(some of the bugs are subtle, so it may appear to work at first but then 
+fail in odd ways if you are out of date). If you don't have a recent 
+version, build from source using these instructions:
+
+http://www.veripool.org/projects/verilator/wiki/Installing
+
+On Linux, the remaining dependencies can be installed using the built-in 
+package manager (apt-get, yum, etc). I've only tested this on Ubuntu, for 
+which the instructions are below. You may need to tweak the package names 
+for other distros:
 
     sudo apt-get install gcc g++ python perl emacs openjdk-7-jdk gtkwave imagemagick libsdl2-dev
 
-On Ubuntu, you must be on 14.10 or later to get the proper version of verilator.  This requires the
-[universe](https://help.ubuntu.com/community/Repositories/Ubuntu) repository to be enabled.
-
-    sudo apt-get install verilator
-
-If you want to make the Nyuzi project, and there are errors like: "Unsupported: SystemVerilog 2005 reserved word not implemented", you can compile verilator from source.
-
-Link: http://www.veripool.org/projects/verilator/wiki/Installing
-
-Download the latest .tar file.
-
-After you downloaded the tar file, you have to uncompress the file, then:
-
-    cd "directory where you uncompressed"
-    ./configure
+    git clone git@github.com:jbush001/NyuziProcessor.git
+    cd NyuziProcessor
     make
-    sudo make install
+    make test
+    
+To run 3D renderer (in emulator)
 
-Bug  fixes in more recent versions of verilator are necessary for this to run correctly, so you
-will need to rebuild from source if your package manager doesn't have the proper version (use verilator 
---version to check)
+    cd software/apps/sceneview
+    make run
+    
 
-### MacOS
+## Building on MacOS
 
 On Mavericks and later, the command line compiler can be installed by typing
-`xcode-select --install`. It will also be installed automatically if you download 
-XCode from the Mac App Store.
 
-MacOS has many of these packages by default, the exceptions being Imagemagick and SDL. 
-To install the remaining packages, I would recommend a package manager like 
-[MacPorts](https://www.macports.org/). The command line for that would be:
+    xcode-select --install 
+    
+It will also be installed automatically if you download XCode from the Mac App Store.
+
+Build the Nyuzi toolchain following instructions in https://github.com/jbush001/NyuziToolchain 
+
+You will need to build verilator from source using instructions here:
+
+http://www.veripool.org/projects/verilator/wiki/Installing
+
+MacOS has many of the required packages by default, the exceptions being
+Imagemagick and SDL. To install the remaining packages, I would recommend
+a package manager like [MacPorts](https://www.macports.org/). The command
+line for that would be:
 
     sudo port install imagemagick libsdl2
-    
-You will need to build verilator from source.
 
-### Windows
+    git clone git@github.com:jbush001/NyuziProcessor.git
+    cd NyuziProcessor
+    make
+    make test
+
+To run 3D renderer (in emulator)
+
+    cd software/sceneview
+    make run
+
+## Building on Windows
 
 I have not tested this on Windows. Many of the libraries are already cross platform, so
 it should theoretically be possible.
-
-## Building and running
-
-1. Build verilog models, libraries, and tools. From the top directory of this 
-project, type:
-
-        make
-
-2. To run verification tests (in Verilog simulation). From the top directory: 
-
-        make test
-
-3. To run 3D renderer (in emulator)
-
-        cd software/sceneview
-        make run
 
 # Running on FPGA
 
 This currently only works under Linux.  It uses Terasic's [DE2-115 evaluation board](http://www.terasic.com.tw/cgi-bin/page/archive.pl?Language=English&No=502).
 
-## Prerequisites
+## Required Software
 
-The following packages must be installed:
+In addition to the packages listed above, this requires:
 
 - libusb-1.0
 - Brian Swetland's [USB Blaster JTAG tools](https://github.com/swetland/jtag)
 - [Quartus II FPGA design software] 
-   (http://dl.altera.com/?edition=web)
-- C/C++ cross compiler toolchain described above https://github.com/jbush001/NyuziToolchain.
+   (http://www.altera.com/products/software/quartus-ii/web-edition/qts-we-index.html)
 
-## Building and running
+## Building and Running
 
-1. Build USB blaster command line tools
- * Update your PATH environment variable to point the directory where you 
-   built the tools.
- * Create a file /etc/udev/rules.d/99-custom.rules and add the line (this 
-   allows using USB blaster tools without having to be root)
+1. Build USB blaster command line tools 
+     
+        sudo apt-get install libusb-dev
+        git clone https://github.com/swetland/jtag
+        cd jtag
+        make 
+
+    Once this is built:
+     * Update your PATH environment variable to point the directory where you 
+       built the tools (there is no install target for this project).
+     * Create a file /etc/udev/rules.d/99-custom.rules and add the following line (this 
+       allows using USB blaster tools without having to be root)
 
             ATTRS{idVendor}=="09fb" , MODE="0660" , GROUP="plugdev" 
 
-2. Build the bitstream (ensure quartus binary directory is in your PATH, by
+2. Synthesize the design (ensure quartus binary directory is in your PATH, by
    default installed in ~/altera/[version]/quartus/bin/)
 
         cd rtl/fpga/de2-115
