@@ -112,7 +112,7 @@ The following packages must be installed:
 - libusb-1.0
 - Brian Swetland's [USB Blaster JTAG tools](https://github.com/swetland/jtag)
 - [Quartus II FPGA design software] 
-   (http://www.altera.com/products/software/quartus-ii/web-edition/qts-we-index.html)
+   (http://dl.altera.com/?edition=web)
 - C/C++ cross compiler toolchain described above https://github.com/jbush001/NyuziToolchain.
 
 ## Building and running
